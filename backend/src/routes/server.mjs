@@ -3,7 +3,7 @@ import express from "express";
 import getGithubAnalysis from "../services/github-analytics.mjs";
 
 const app = express()
-app.use(cors({ origin: ["http://localhost:5173", "http://localhost:5174"] }));  // Allows traffic of another server 
+app.use(cors({ origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:4173"] }));  // Allows traffic of another server 
 /* 
 req, res = requests, response
 
@@ -11,16 +11,15 @@ req, res = requests, response
 where reach our fn send by Handler.
 - 'app' works as router and send response at path (endpoint)   
 */
-app.get("/api/github", async (req, res) => {
+app.get("/github", async (req, res) => {
     try {
         const data = await getGithubAnalysis();
         res.json(data);
-        res.send("[INFO] API running");
     } catch (err) {
         res.status(500).json({ error: err.message }) // '500' Means internal Server Error 
     }
 });
 
 app.listen(3000, () => {
-    console.log("[INFO] Server running in port 3000: http://localhost:3000/")
+    console.log("[INFO] Server running in port 3000: http://localhost:3000/ \nIf you wanna API Stats: http://localhost:3000/github")
 })
