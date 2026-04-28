@@ -3,7 +3,7 @@ import express from "express";
 import getGithubAnalysis from "../services/github-analytics.mjs";
 
 const app = express()
-app.use(cors({ origin: "http://localhost:5174" }));
+app.use(cors({ origin: ["http://localhost:5173", "http://localhost:5174"] }));  // Allows traffic of another server 
 /* 
 req, res = requests, response
 
