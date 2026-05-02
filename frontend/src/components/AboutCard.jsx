@@ -15,9 +15,9 @@ async function fetchData() {
 }
 function AboutCard() {
     return (
-        <div className='card'>
+        <div className='w-lg mt-8 text-xs'>
             <h1>About Me</h1>
-            <p style={{ whiteSpace: "pre-line" }}>{ABOUTME}</p>
+            <p className="text-center text-white mx-auto">{ABOUTME}</p>
             <h2>Tech Stack</h2>
 
             <h3>Languages</h3>
