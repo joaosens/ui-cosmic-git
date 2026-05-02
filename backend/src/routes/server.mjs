@@ -1,6 +1,14 @@
 import cors from 'cors';
 import express from "express";
 import getGithubAnalysis from "../services/github-analytics.mjs";
+import 'dotenv/config';
+import path from 'path'; 
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, "../../../.env")});
+
 
 const app = express()
 app.use(cors({ origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:4173"] }));  // Allows traffic of another server 
@@ -20,6 +28,6 @@ app.get("/github", async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log("[INFO] Server running in port 3000: http://localhost:3000/ \nIf you wanna API Stats: http://localhost:3000/github")
+app.listen(process.env.PORT, () => {
+    console.log(`[INFO] Server running in port ${process.env.PORT}: http://localhost:/${process.env.PORT} \nIf you wanna API Stats: http://localhost:${process.env.PORT}/github`)
 })

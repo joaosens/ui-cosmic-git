@@ -17,11 +17,21 @@ function StatsReveal() {
         }
         fetchData();
     }, []);
-    if (loading) return <h1>Loading…</h1>;
+    function StatItem({label, value}) {
+        return(
+            <div className="flex justify-between text-sm"></div>
+        )
+    }
+    if (loading)
+        return (
+            <h1 className="text-center text-white/50 font-bold animate-pulse space-y-4">
+                Loading...
+            </h1>
+        );
     if (!data) return (
         <>
             <h1>[ERROR] No data</h1>
-            <p>𝐓𝐑𝐘 𝐀𝐆𝐀𝐈𝐍 ↻</p>
+            <p>Try Again ↻</p>
         </>
     );
     return (

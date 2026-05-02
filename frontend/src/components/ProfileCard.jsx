@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getGithubStats } from "../services/api.mjs";
 
-const USERNAME = "Joao Eduardo Sens"
+const USERNAME = "João Eduardo Sens"
 const EMAIL = "joaoeduardo.analytics@gmail.com"
 const LOCAL = "Curitiba Paraná"
 
@@ -23,11 +23,22 @@ function ProfileCard() { // Components mustn't be 'async'
         }
     }
     return (
-        <div className='card'>
-            <h1>👤 {USERNAME}</h1>
-            {avatar && <img src={avatar} alt="Avatar" />}
-            <p onClick={handleCopy} style={{ cursor: "pointer" }}>📧 {EMAIL}</p>
-            <p>🗺️ {LOCAL}</p>
+        <div className="bg-white/5 border-white/10 rounded-2xl mt-8 p-6 h-[200px] w-[250px] text-center shadow-lg hover:shadow-purple-500/20 transition-all duration-300">
+            {avatar && (
+                <img
+                    className="w-20 h-20 rounded-full mx-auto border-2 border-purple-500 shadow-md hover:ring-2 hover:ring-purple-400 transition-all"
+                    src={avatar}
+                    alt="Avatar"
+                />
+            )}
+            <h1 className="mt-4 text-lg font-semibold p-[6px] tracking-wide"> 👤 {USERNAME}</h1>
+            <p
+                className="text-sm text-gray-400 p-[6px] hover:text-purple-400 transition"
+                onClick={handleCopy}
+            >
+                📧 {EMAIL}
+            </p>
+            <p className="text-xs p-[6px] text-gray-500 mt-1">🗺️ {LOCAL}</p>
         </div>
     );
 }

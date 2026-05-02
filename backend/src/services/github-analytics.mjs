@@ -1,4 +1,8 @@
-import 'dotenv/config'
+import 'dotenv/config';
+
+const __filename = fileURLToPath(import.meta.url); // Get OS path file 
+const __dirname = path.dirname(__filename); // Get only directory father of file
+dotenv.config({ path: path.resolve(__dirname, "../../../.env")}); // Based on directory attempts find 'env' with your fathers
 
 /*
 node -> JavaScript runtime (runs JS outside the browser)
