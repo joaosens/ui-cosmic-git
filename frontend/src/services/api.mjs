@@ -1,5 +1,3 @@
-import dotenv from "dotenv";
-
 const baseUrl = import.meta.env.VITE_API_URL; // Try find '.env' in root directory executed
 
 export async function getGithubStats() {
