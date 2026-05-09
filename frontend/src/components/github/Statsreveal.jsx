@@ -59,7 +59,7 @@ const StatsReveal = forwardRef(function StatsReveal({ onClick }, ref) {
                         <ul className="space-y-1">
                             {languageEntries.map(([lang, count]) => (
                                 <li key={lang}>
-                                    🢒 {lang}: <span className="text-gray-400"><SlotMachine value={Object.values(data.languages)} data={data}/></span>
+                                    🢒 {lang}: <span className="text-gray-400"><SlotMachine value={count} data={data}/></span>
                                 </li>
                             ))}
                         </ul>
@@ -113,32 +113,22 @@ function SlotMachine({ value, data }) {
 
     const [offset, setOffset] = useState(0)
 
-    const ITEM_HEIGHT = 11
-
-    useEffect(() => {
-
-        const interval = setInterval(() => {
-
-            setOffset(prev => prev + ITEM_HEIGHT)
-
-        }, 120)
-
-        return () => clearInterval(interval)
-
-    }, [])
+    const ITEM_HEIGHT = 15
 
     let items = []
 
+    // ARRAY
     if (Array.isArray(value)) {
 
         items = value
 
     }
 
+    // NUMBER
     else if (typeof value === "number") {
 
         const fakeNumbers = Array.from(
-            { length: 30 },
+            { length: 10 },
             () => Math.floor(Math.random() * 999)
         )
 
@@ -146,6 +136,7 @@ function SlotMachine({ value, data }) {
 
     }
 
+    // STRING
     else if (typeof value === "string") {
 
         const repoNames =
@@ -163,10 +154,37 @@ function SlotMachine({ value, data }) {
 
     }
 
+    const last =
+        (items.length - 1)
+        * ITEM_HEIGHT
+
+    useEffect(() => {
+
+        const interval = setInterval(() => {
+
+            setOffset(prev => {
+
+                if (prev >= last) {
+
+                    clearInterval(interval)
+
+                    return last
+                }
+
+                return prev + ITEM_HEIGHT
+
+            })
+
+        }, 120)
+
+        return () => clearInterval(interval)
+
+    }, [last])
+
     return (
 
         <div className="
-            h-[20px]
+            h-[15px]
             overflow-hidden
         ">
 
@@ -174,6 +192,7 @@ function SlotMachine({ value, data }) {
                 className="
                     transition-transform
                     duration-100
+                    ease-linear
                 "
                 style={{
                     transform:
@@ -186,7 +205,7 @@ function SlotMachine({ value, data }) {
                     <div
                         key={index}
                         className="
-                            h-[20px]
+                            h-[15px]
                             flex
                             items-center
                             text-[11px]

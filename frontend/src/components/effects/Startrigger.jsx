@@ -3,9 +3,8 @@ import { Canvas, useFrame } from "@react-three/fiber"
 import { Sphere, Float } from "@react-three/drei"
 
 function StarMesh({
-    clickCount,
     isExploding,
-    handleClicks
+    triggerExplosion
 }) {
 
     const ref = useRef(null)
@@ -13,7 +12,7 @@ function StarMesh({
     const shakeIntensity =
         isExploding
             ? 0.08
-            : 0.01 * clickCount
+            : 0.01
 
     useFrame((state) => {
 
@@ -54,7 +53,7 @@ function StarMesh({
                 />
 
                 <group
-                    onClick={handleClicks}
+                    onClick={triggerExplosion}
                     ref={ref}
                 >
 
@@ -90,21 +89,8 @@ function StarMesh({
 }
 
 function StarTrigger({ onReveal }) {
-
-    const [clickCount, setClickCount] = useState(0)
     const [isExploding, setIsExploding] = useState(false)
     const [finished, setFinished] = useState(false)
-    function handleClicks() {
-        if (isExploding) return
-
-        const next = clickCount + 1
-
-        setClickCount(next)
-
-        if (next === 1) {
-            triggerExplosion()
-        }
-    }
 
     function triggerExplosion() {
 
@@ -165,7 +151,7 @@ function StarTrigger({ onReveal }) {
 
             </div>
 
-            <h1 onClick={handleClicks}
+            <h1 onClick={triggerExplosion}
                 className="
                     text-center
                     text-white
@@ -185,9 +171,8 @@ function StarTrigger({ onReveal }) {
                 <ambientLight intensity={0.15} />
 
                 <StarMesh
-                    clickCount={clickCount}
                     isExploding={isExploding}
-                    handleClicks={handleClicks}
+                    triggerExplosion={triggerExplosion}
                 />
 
             </Canvas>
