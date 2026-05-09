@@ -1,7 +1,7 @@
 import { useState, useEffect, forwardRef } from "react";
 import { getGithubStats } from "../../services/api";
 
-const StatsReveal = forwardRef(function StatsReveal(_, ref) {
+const StatsReveal = forwardRef(function StatsReveal({ onClick }, ref) {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
 
@@ -36,36 +36,30 @@ const StatsReveal = forwardRef(function StatsReveal(_, ref) {
     const languageEntries = Object.entries(data.languages || {});
 
     return (
-        <MainBox icon="📊" title="Stats" ref={ref} loading={loading}>
+        <MainBox icon="📊" title="Stats" ref={ref} onClick={onClick} loading={loading}>
             <StatsSection icon="📦" title="Repository">
-                <StatItem label="Total Repositories" value={`🢞 ${data.totalRepos}`} />
+                <StatItem label="Total Repositories" value={<SlotMachine value={data.totalRepos} data={data}/>} />
                 <StatItem
                     label="Top Repositories"
-                    value={
-                        <ul className="space-y-1">
-                            {topRepos.map((repo) => (
-                                <li key={repo}>➤ {repo}</li>
-                            ))}
-                        </ul>
+                    value={ <SlotMachine value={topRepos} data={data}/>
                     } highlight
                 />
-                <StatItem label="Latest" value={`➤ ${data.latestRepo}`} />
+                <StatItem label="Latest" value={<SlotMachine value={data.latestRepo} data={data}/>} />
             </StatsSection>
-
             <StatsSection icon="🌟" title="Stars">
-                <StatItem label="Total Stars" value={`🢞 ${data.totalStars}`} />
-                <StatItem label="Average" value={`🢞 ${data.avgStars}`} />
+                <StatItem label="Total Stars" value={<SlotMachine value={data.totalStars} data={data}/>} />
+                <StatItem label="Average" value={<SlotMachine value={data.avgStars} data={data}/>} />
             </StatsSection>
 
             <StatsSection icon="👾" title="Languages">
-                <StatItem label="Top Language" value={`🢒 ${data.topLanguage}`} highlight />
+                <StatItem label="Top Language" value={<SlotMachine value={data.topLanguage} data={data}/>} highlight />
                 <StatItem
                     label="Distribution"
                     value={
                         <ul className="space-y-1">
                             {languageEntries.map(([lang, count]) => (
                                 <li key={lang}>
-                                    🢒 {lang}: <span className="text-gray-400">{count}</span>
+                                    🢒 {lang}: <span className="text-gray-400"><SlotMachine value={Object.values(data.languages)} data={data}/></span>
                                 </li>
                             ))}
                         </ul>
@@ -76,19 +70,20 @@ const StatsReveal = forwardRef(function StatsReveal(_, ref) {
     );
 });
 
-const MainBox = forwardRef(function MainBox({icon, title, children}, ref){
+const MainBox = forwardRef(function MainBox({icon, title, children, onClick}, ref){
     return (
-        <div className="group 
+        <div className="group relative z-40
         mx-auto my-8 max-w-[80%] 
         p-10 bg-white/5 
         backdrop-blur-md 
         ring-1 ring-white/10 
         rounded-xl 
         shadow-lg shadow-purple-500/50 
+        cursor-pointer
         hover:shadow-purple-700/50 
-        hover:scale-[1.02]
+        hover:scale-120
         transition-all duration-300
-        animate-fadeIn" ref={ref}>    {/* Glassmorphism with FadeIn Animation*/}
+        animate-fadeIn" onClick={onClick} ref={ref}>    {/* Glassmorphism with FadeIn Animation*/}
             <h1 className="text-center text-2xl font-bold uppercase tracking-tight mb-10">
                 <span className="mr-2">{icon}</span><span className={`text-white hover:drop-shadow-[0_0_10px_rgba(168,85,247,0.5)] group-hover:text-purple-400 ${title} transition-all duration-300`}>{title}</span></h1>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">{children}</div></div> 
@@ -114,4 +109,97 @@ function StatItem({label, value, highlight = false}) {
     )
 }
 
+function SlotMachine({ value, data }) {
+
+    const [offset, setOffset] = useState(0)
+
+    const ITEM_HEIGHT = 11
+
+    useEffect(() => {
+
+        const interval = setInterval(() => {
+
+            setOffset(prev => prev + ITEM_HEIGHT)
+
+        }, 120)
+
+        return () => clearInterval(interval)
+
+    }, [])
+
+    let items = []
+
+    if (Array.isArray(value)) {
+
+        items = value
+
+    }
+
+    else if (typeof value === "number") {
+
+        const fakeNumbers = Array.from(
+            { length: 30 },
+            () => Math.floor(Math.random() * 999)
+        )
+
+        items = [...fakeNumbers, value]
+
+    }
+
+    else if (typeof value === "string") {
+
+        const repoNames =
+            data?.topRepos || []
+
+        const languages =
+            Object.keys(data?.languages || {})
+
+        const fakeStrings = [
+            ...repoNames,
+            ...languages
+        ]
+
+        items = [...fakeStrings, value]
+
+    }
+
+    return (
+
+        <div className="
+            h-[20px]
+            overflow-hidden
+        ">
+
+            <div
+                className="
+                    transition-transform
+                    duration-100
+                "
+                style={{
+                    transform:
+                        `translateY(-${offset}px)`
+                }}
+            >
+
+                {items.map((item, index) => (
+
+                    <div
+                        key={index}
+                        className="
+                            h-[20px]
+                            flex
+                            items-center
+                            text-[11px]
+                        "
+                    >
+                        {item}
+                    </div>
+
+                ))}
+
+            </div>
+
+        </div>
+    )
+}
 export default StatsReveal;

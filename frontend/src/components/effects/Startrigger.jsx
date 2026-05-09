@@ -1,17 +1,14 @@
 import { useState, useRef } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
-import { Sphere, Float, Html } from "@react-three/drei"
+import { Sphere, Float } from "@react-three/drei"
 
-function StarMesh({ clickCount, isExploding }) {
+function StarMesh({
+    clickCount,
+    isExploding,
+    handleClicks
+}) {
 
     const ref = useRef(null)
-
-    const intensity =
-        clickCount === 0
-            ? 1
-            : clickCount === 1
-            ? 1.3
-            : 1.7
 
     const shakeIntensity =
         isExploding
@@ -25,6 +22,20 @@ function StarMesh({ clickCount, isExploding }) {
         ref.current.rotation.z =
             Math.sin(state.clock.elapsedTime * 10)
             * shakeIntensity
+
+        const targetScale = isExploding ? 12 : 1
+
+        ref.current.scale.x +=
+            (targetScale - ref.current.scale.x)
+            * 0.08
+
+        ref.current.scale.y +=
+            (targetScale - ref.current.scale.y)
+            * 0.08
+
+        ref.current.scale.z +=
+            (targetScale - ref.current.scale.z)
+            * 0.08
 
     })
 
@@ -43,7 +54,7 @@ function StarMesh({ clickCount, isExploding }) {
                 />
 
                 <group
-                    scale={isExploding ? 2 : intensity}
+                    onClick={handleClicks}
                     ref={ref}
                 >
 
@@ -82,16 +93,15 @@ function StarTrigger({ onReveal }) {
 
     const [clickCount, setClickCount] = useState(0)
     const [isExploding, setIsExploding] = useState(false)
-
+    const [finished, setFinished] = useState(false)
     function handleClicks() {
-
         if (isExploding) return
 
         const next = clickCount + 1
 
         setClickCount(next)
 
-        if (next >= 3) {
+        if (next === 1) {
             triggerExplosion()
         }
     }
@@ -104,58 +114,80 @@ function StarTrigger({ onReveal }) {
 
             onReveal()
 
+        }, 700)
+
+        setTimeout(() => {
+
             setIsExploding(false)
+            setFinished(true)
 
-        }, 600)
+        }, 1200)
     }
-
+    if (finished) return (<h1 className="mt-16
+        text-center
+        text-white
+        uppercase
+        tracking-[0.50em]
+        [text-shadow:0_0_20px_rgba(125,211,252,0.8)]
+        animate-floating">Thanks your visit!</h1>)
     return (
-        <div className="relative w-full h-[250px] mt-[50px] mx-auto">
-
+        <div className="relative 
+            w-full h-[250px] 
+            mt-[50px] mx-auto">
             <div
                 className={`
                     fixed
                     inset-0
-                    bg-white
-                    transition-opacity
-                    duration-700
+                    z-20
                     pointer-events-none
-                    ${isExploding ? "opacity-90" : "opacity-0"}
+                    transition-all
+                    duration-700
+                    ${isExploding ? "opacity-100 scale-100" : "opacity-0 scale-150"}
                 `}
-            />
+            >
 
-            <Canvas className="cursor-pointer">
+                <div
+                    className="
+                        absolute
+                        inset-0
+                        bg-white
+                    "
+                />
+
+                <div
+                    className="
+                        absolute
+                        inset-0
+                        bg-cyan-400/40
+                        blur-[120px]
+                    "
+                />
+
+            </div>
+
+            <h1 onClick={handleClicks}
+                className="
+                    text-center
+                    text-white
+                    text-sm
+                    tracking-[0.25em]
+                    uppercase
+                    [text-shadow:0_0_20px_rgba(125,211,252,0.8)]
+                    cursor-pointer
+                    hover:scale-105
+                "
+            >
+                Click To Reveal My Stats
+            </h1>
+
+            <Canvas className="cursor-pointer z-30">
 
                 <ambientLight intensity={0.15} />
-
-                <Html center position={[0, 3.2, 0]}>
-
-                    <div className="w-[240px] text-center">
-
-                        <h1
-                            onClick={handleClicks}
-                            className="
-                                text-white
-                                text-sm
-                                tracking-[0.25em]
-                                uppercase
-                                inline-block
-                                transition-transform
-                                duration-300
-                                hover:scale-105
-                                [text-shadow:0_0_20px_rgba(125,211,252,0.8)]
-                            "
-                        >
-                            Click To Reveal My Stats
-                        </h1>
-
-                    </div>
-
-                </Html>
 
                 <StarMesh
                     clickCount={clickCount}
                     isExploding={isExploding}
+                    handleClicks={handleClicks}
                 />
 
             </Canvas>

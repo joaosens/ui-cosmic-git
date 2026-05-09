@@ -3,7 +3,7 @@
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(50px);
+        transform: translateY(100px);
     }
 
     to {
@@ -13,7 +13,7 @@
 }
 
 .animate-fadeIn {
-    animation: fadeIn 2.0s ease-out
+    animation: fadeIn 1.0s ease-out
 }
 
 @keyframes twinkle {
@@ -79,4 +79,114 @@
 
 .animate-twinkle-sh {
     animation : twinkle-sh 3s linear infinite 
+}
+
+
+@keyframes exploding {
+
+    0% {
+        transform:
+            scale(1)
+            translate(0px, 0px)
+            rotate(0deg);
+    }
+
+    10% {
+        transform:
+            scale(1.2)
+            translate(-4px, 3px)
+            rotate(-1deg);
+    }
+
+    20% {
+        transform:
+            scale(1.5)
+            translate(5px, -3px)
+            rotate(1deg);
+    }
+
+    30% {
+        transform:
+            scale(2)
+            translate(-8px, 5px)
+            rotate(-2deg);
+    }
+
+    50% {
+        transform:
+            scale(4)
+            translate(10px, -10px)
+            rotate(3deg);
+    }
+
+    70% {
+        transform:
+            scale(8)
+            translate(-15px, 10px)
+            rotate(-5deg);
+    }
+
+    100% {
+        transform:
+            scale(20)
+            translate(0px, 0px)
+            rotate(0deg);
+
+        opacity: 0;
+    }
+}
+
+.animate-exploding {
+    animation:
+        exploding
+        700ms
+        ease-out
+        forwards;
+}
+
+@keyframes floating {
+
+    0% {
+        transform:
+            translateY(0px)
+            translateX(0px)
+            rotate(0deg);
+    }
+
+    25% {
+        transform:
+            translateY(-9px)
+            translateX(-4px)
+            rotate(-1.0deg);
+    }
+
+    50% {
+        transform:
+            translateY(4px)
+            translateX(3px)
+            rotate(2deg);
+    }
+
+    75% {
+        transform:
+            translateY(-10px)
+            translateX(5px)
+            rotate(-2deg);
+    }
+
+    100% {
+        transform:
+            translateY(0px)
+            translateX(0px)
+            rotate(0deg);
+    }
+}
+
+
+.animate-floating {
+    animation:
+        floating
+        10s
+        ease-in-out
+        infinite;
 }

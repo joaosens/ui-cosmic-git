@@ -18,39 +18,69 @@ function App() {
   const [showStats, setShowStats] = useState(false);
   const statsRef = useRef(null);
   useEffect(() => {
-    if (!showStats) return;
     const timer = setTimeout(() => {  // Timeout to preventing conflict with Loading time  
       statsRef.current?.scrollIntoView({  //Scrolls and centralize any Element
       behavior: "smooth",
       block: "end",
     })}, 350)
     return () => clearTimeout(timer);
-    }, [showStats]);
+    }, [showStats])
 
-  return (
-    <div className="relative 
-    min-h-screen 
-    bg-gradient-to-br 
-    from-black 
-    via-gray-800 
-    to-purple-900 
-    text-white 
-    flex flex-col 
-    items-center 
-    justify-start 
-    py-20">
-      <BackgroundStars />
-      <ShootingStar />
-      <div className="relative z-10 flex flex-col items-center"> 
-        <div onClick={() =>
-          setFlipped(!flipped)} className="cursor-pointer hover:scale-105 transition" > {/* If click stays with different state of 'flipped'*/}
-          {flipped ? <AboutCard /> : <ProfileCard />} {/* Now changes by condition in compare with 'flipped'*/}
-        </div>
-        <StarTrigger onReveal={() =>
-          setShowStats(true)} />
-        {showStats && <StatsReveal ref={statsRef} />}
-       </div>
-      </div>
-  );
+    return (
+      <>
+        
+        {showStats && (
+          <div className="
+            fixed
+            inset-0
+            bg-black/50
+            backdrop-blur-md
+            z-20
+          " />
+        )}
+    
+        <div className="
+          relative
+          min-h-screen
+          bg-gradient-to-br
+          from-black
+          via-gray-800
+          to-purple-900
+          text-white
+          flex flex-col
+          items-center
+          justify-start
+          py-20
+        ">
+    
+          <BackgroundStars />
+          <ShootingStar />   
+          <div
+            onClick={() => setFlipped(!flipped)}
+            className="
+              cursor-pointer
+              hover:scale-105
+              transition
+            "
+          >
+            {flipped
+              ? <AboutCard />
+              : <ProfileCard />
+            }
+          </div>
+          <StarTrigger
+            onReveal={() =>  
+              setShowStats(true)}
+          />
+    
+          {showStats && (
+            <StatsReveal onClick={() => 
+              setShowStats(false)
+            } ref={statsRef} />
+          )}
+    
+          </div>   
+      </>
+    )
 }
 export default App

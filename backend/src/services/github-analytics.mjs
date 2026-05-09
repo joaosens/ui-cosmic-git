@@ -208,6 +208,7 @@ function extraRepos(rawInfo, data) {
         followers: rawInfo.followers,
         latestRepo: repoName,
         forks: rawInfo.forks,
+        allRepos: repos.map((repo)=>repo.name),
         totalRepos: rawInfo.totalRepos,
         totalStars: rawInfo.totalStars,
         avgStars: Number(avgStars.toFixed(2)),
