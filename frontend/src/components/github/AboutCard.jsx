@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getGithubStats } from "../../../services/api.mjs";
+import { getGithubStats } from "../../services/api.mjs";
 
 const ABOUTME = `
 I am a systems builder focused on designing and developing end-to-end solutions that transform real-world problems into structured, scalable and production-oriented systems.
