@@ -1,1 +1,82 @@
 @import "tailwindcss";
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 2.0s ease-out
+}
+
+@keyframes twinkle {
+    0% {
+        opacity: 0.2;
+        transform: scale(1.4);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.4);
+    }
+    100% {
+        opacity: 0.2;
+        transform: scale(1);
+    }
+}
+
+.animate-twinkle {
+    animation: twinkle 3s infinite ease-in-out;
+}
+
+@keyframes shootingstar {
+    0% {
+        transform: 
+        translateY(300px)
+        translateX(-400px)
+        scale(0.1)
+        rotate(-18deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        transform: 
+        translateY(0vh)
+        translateX(100vw) 
+        scale(1.0)
+        rotate(-18deg);
+    }
+}
+
+.animate-shootingstar {
+    animation: shootingstar 25s linear infinite
+}
+
+@keyframes twinkle-sh {
+    0% {
+        opacity: .6;
+        transform: scale(.9);
+     }
+     
+     50% {
+        opacity: 1;
+        transform: scale(1);
+     }
+     
+     100% {
+        opacity: .7;
+        transform: scale(.92);
+     }
+}
+
+.animate-twinkle-sh {
+    animation : twinkle-sh 3s linear infinite 
+}

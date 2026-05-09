@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./index.css"; // File with Tailwind
-import ProfileCard from "./components/ProfileCard.jsx";  // Components has capitalize letter in start place
-import AboutCard from "./components/AboutCard.jsx"; // Components = .jsx  
-import StarTrigger from "./components/Startrigger.jsx";
-import StatsReveal from "./components/Statsreveal.jsx";
+import ProfileCard from "./components/github/ProfileCard.jsx";  // Components has capitalize letter in start place
+import AboutCard from "./components/github/AboutCard.jsx"; // Components = .jsx  
+import StarTrigger from "./components/effects/Startrigger.jsx";
+import StatsReveal from "./components/github/Statsreveal.jsx";
+import BackgroundStars from "./components/effects/BackgroundStars.jsx";
+import ShootingStar from "./components/effects/ShootingStar.jsx"
 /*
 - App.jsx doesn't needs format file in path, recognizes anyway
 ===> Hooks <===
@@ -14,27 +16,41 @@ import StatsReveal from "./components/Statsreveal.jsx";
 function App() {
   const [flipped, setFlipped] = useState(false);
   const [showStats, setShowStats] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const statsRef = useRef(null);
   useEffect(() => {
-    setLoading(false);
-  }, []);
-  if (loading)
-    return (
-      <h1 className="text-center text-white/50 font-bold animate-pulse space-y-4">
-        Loading...
-      </h1>
-    );
+    if (!showStats) return;
+    const timer = setTimeout(() => {  // Timeout to preventing conflict with Loading time  
+      statsRef.current?.scrollIntoView({  //Scrolls and centralize any Element
+      behavior: "smooth",
+      block: "end",
+    })}, 350)
+    return () => clearTimeout(timer);
+    }, [showStats]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-800 to-purple-900 text-white flex flex-col items-center justify-center">
-      <div onClick={() =>
-        setFlipped(!flipped)} className="cursor-pointer hover:scale-105 transition" > {/* If click stays with different state of 'flipped'*/}
-        {flipped ? <AboutCard /> : <ProfileCard />} {/* Now changes by condition in compare with 'flipped'*/}
+    <div className="relative 
+    min-h-screen 
+    bg-gradient-to-br 
+    from-black 
+    via-gray-800 
+    to-purple-900 
+    text-white 
+    flex flex-col 
+    items-center 
+    justify-start 
+    py-20">
+      <BackgroundStars />
+      <ShootingStar />
+      <div className="relative z-10 flex flex-col items-center"> 
+        <div onClick={() =>
+          setFlipped(!flipped)} className="cursor-pointer hover:scale-105 transition" > {/* If click stays with different state of 'flipped'*/}
+          {flipped ? <AboutCard /> : <ProfileCard />} {/* Now changes by condition in compare with 'flipped'*/}
+        </div>
+        <StarTrigger onClick={() =>
+          setShowStats(true)} />
+        {showStats && <StatsReveal ref={statsRef} />}
+       </div>
       </div>
-      <StarTrigger onClick={() =>
-        setShowStats(true)} />
-      {showStats && <StatsReveal />}
-    </div>
   );
 }
 export default App
-

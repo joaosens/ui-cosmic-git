@@ -1,9 +1,9 @@
 import cors from 'cors';
 import express from "express";
 import getGithubAnalysis from "../services/github-analytics.mjs";
-import 'dotenv/config';
-import path from 'path'; 
-import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import path from 'node:path'; 
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

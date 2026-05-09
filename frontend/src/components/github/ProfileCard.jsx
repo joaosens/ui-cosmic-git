@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getGithubStats } from "../services/api.mjs";
+import { getGithubStats } from "../../services/api.mjs";
 
 const USERNAME = "João Eduardo Sens"
 const EMAIL = "joaoeduardo.analytics@gmail.com"
@@ -23,7 +23,7 @@ function ProfileCard() { // Components mustn't be 'async'
         }
     }
     return (
-        <div className="bg-white/5 border-white/10 rounded-2xl mt-8 p-6 h-[200px] w-[250px] text-center shadow-lg hover:shadow-purple-500/20 transition-all duration-300">
+        <div className="bg-white/5 backdrop-blur-md border-white/10 rounded-2xl mt-8 p-6 h-[200px] w-[250px] shadow-lg shadow-purple-500/50 text-center shadow-md hover:shadow-purple-700/50 transition-all duration-300">
             {avatar && (
                 <img
                     className="w-20 h-20 rounded-full mx-auto border-2 border-purple-500 shadow-md hover:ring-2 hover:ring-purple-400 transition-all"
