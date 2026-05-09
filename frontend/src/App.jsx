@@ -46,7 +46,7 @@ function App() {
           setFlipped(!flipped)} className="cursor-pointer hover:scale-105 transition" > {/* If click stays with different state of 'flipped'*/}
           {flipped ? <AboutCard /> : <ProfileCard />} {/* Now changes by condition in compare with 'flipped'*/}
         </div>
-        <StarTrigger onClick={() =>
+        <StarTrigger onReveal={() =>
           setShowStats(true)} />
         {showStats && <StatsReveal ref={statsRef} />}
        </div>
