@@ -128,15 +128,13 @@ function SlotMachine({ value, data }) {
     else if (typeof value === "number") {
 
         const fakeNumbers = Array.from(
-            { length: 10 },
-            () => Math.floor(Math.random() * 999)
+            { length: 20 },
+            () => Math.floor(Math.random() * 100)
         )
 
         items = [...fakeNumbers, value]
 
     }
-
-    // STRING
     else if (typeof value === "string") {
 
         const repoNames =
@@ -150,7 +148,7 @@ function SlotMachine({ value, data }) {
             ...languages
         ]
 
-        items = [...fakeStrings, value]
+        items = [...fakeStrings, ...fakeStrings, ...fakeStrings, ...fakeStrings, value]
 
     }
 
@@ -200,10 +198,10 @@ function SlotMachine({ value, data }) {
                 }}
             >
 
-                {items.map((item, index) => (
+                {items.map((item, i) => (
 
                     <div
-                        key={index}
+                        key={i}
                         className="
                             h-[15px]
                             flex

@@ -66,4 +66,9 @@ function AboutCard() {
     );
 }
 
+function ConteinerItems({ section, children }) {
+    return (<div className="h-[600px] w-[300px] "></div>
+        )
+}
+
 export default AboutCard;
