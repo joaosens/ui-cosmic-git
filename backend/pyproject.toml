@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "api-github-backend"
+version = "0.1.0"
+description = "backend services and routes with FastAPI"
+readme = "README.md" 
+requires-python = "~=3.12.0"
+dependencies = [
+    "dotenv>=0.9.9",
+    "fastapi>=0.136.1",
+    "uvicorn>=0.46.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.uv]
+managed = true
