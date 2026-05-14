@@ -13,6 +13,5 @@ except Exception as e:
 
 class Settings: 
     TOKEN = os.getenv("TOKEN")
-    PORT = os.getenv("PORT")
 
 settings = Settings()
