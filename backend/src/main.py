@@ -11,4 +11,4 @@ async def root():
     return {
         "message":"Server running"
     } 
-@app.include_router(github_router)
+app.include_router(github_router)
