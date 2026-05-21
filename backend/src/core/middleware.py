@@ -1,74 +1,141 @@
+from starlette.types import ASGIApp, Receive, Scope, Send
 import time
 import logging
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
 
+from fastapi.responses import JSONResponse
 from src.core.redis import redis_client
-from src.routes.github import router as github_router
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
 
-RATE_LIMIT_WINDOW = 300
-MAX_REQUESTS = 1
+class LogRequestsMiddleware:
+    """
+    Middleware responsible for logging:
+    - incoming requests
+    - latency
+    """
 
-@app.middleware("http")
-async def log_requests(request, call_next):
+    def __init__(self, app: ASGIApp):
+        # Reference to the next ASGI app/middleware
+        self.app = app
 
-    # Starts latency timer before endpoint execution.
-    start_time = time.time()
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
 
-    logger.info(
-        f"[REQUEST] "
-        f"method={request.method} "
-        f"path={request.url.path}"
-    )
+        # Ignore non-HTTP traffic (e.g. WebSockets)
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
 
-    # Continues request lifecycle through routes/middlewares.
-    response = await call_next(request)
+        # Start request timer
+        start_time = time.time()
 
-    # Calculates total backend processing time.
-    process_time = time.time() - start_time
+        # Log request metadata
+        logger.info(
+            f"[REQUEST] method={scope['method']} path={scope['path']}"
+        )
 
-    logger.info(
-        f"[RESPONSE] "
-        f"status={response.status_code} "
-        f"duration={process_time:.4f}s"
-    )
+        # Continue request lifecycle
+        await self.app(scope, receive, send)
 
-    return response
+        # Calculate total request time
+        process_time = time.time() - start_time
 
-async def rate_limit(request, call_next):
+        logger.info(
+            f"[RESPONSE] duration={process_time:.4f}s"
+        )
 
-    client_ip = request.client.host
 
-    key = f"rate_limit:{client_ip}" # Only key
+class RateLimitMiddleware:
+    """
+    Simple Redis-based rate limiter.
+    """
 
-    current_requests = await redis_client.incr(key) # Yet we don't put a value to key, for your pattern INCR will be equals 1
+    def __init__(
+        self,
+        app: ASGIApp,
+        window: int,
+        max_requests: int
+    ):
+        self.app = app
+        self.window = window
+        self.max_requests = max_requests
 
-    if current_requests == 1:
-        await redis_client.expire(
-            key,
-            RATE_LIMIT_WINDOW)
+    async def __call__(
+        self,
+        scope: Scope,
+        receive: Receive,
+        send: Send
+    ):
 
-    if current_requests > MAX_REQUESTS:
-        return JSONResponse(
-            status_code=429, 
-            content={"detail":"You can only send one message every five minutes."})
-    return await call_next(request)
+        # Ignore non-HTTP requests
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
 
-# CORS system security intermediarium between browser and backend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173" # Allow fetchs of any slugs
+        # Extract client IP from ASGI scope
+        client = scope.get("client")
+        client_ip = client[0] if client else "unknown"
+
+        # Unique Redis key per client
+        key = f"rate_limit:{client_ip}"
+
+        # Increment request counter
+        current_requests = await redis_client.incr(key)
+
+        # Set expiration only on first request
+        if current_requests == 1:
+            await redis_client.expire(key, self.window)
+
+        # Block requests above the allowed limit
+        if current_requests > self.max_requests:
+
+            response = JSONResponse(
+                status_code=429,
+                content={
+                    "detail": (
+                        "Too many requests"
+                    )
+                }
+            )
+
+            # Send ASGI response manually
+            await response(scope, receive, send)
+            return
+
+        # Continue normal request flow
+        await self.app(scope, receive, send)
+
+"""
+    ===> SCOPE PAYLOAD <=== 
+
+    "type": "http",                       - Identifies the protocol type
+    "asgi": {"version": "3.0", "spec_version": "2.3"}, - ASGI specification versions
+    "http_version": "1.1",                 - HTTP version used (e.g., "1.1", "2")
+    "method": "POST",                      - HTTP Method
+    "scheme": "https",                     - URL scheme used ("http" or "https")
+    "path": "/users/create",               - Decoded URL path string
+    "raw_path": b"/users/create",          - Original URL path as raw bytes
+    "query_string": b"active=true&id=10",  - Raw query string bytes
+    "headers": [                           - List of (key, value) tuples as bytes
+        (b"host", b"://example.com"),
+        (b"content-type", b"application/json"),
+        (b"user-agent", b"Mozilla/5.0...")
     ],
-    allow_credentials=True, # Allow cookies, session tokens and authorization headers
-    allow_methods=["*"], # Allow all methods HTTP
-    allow_headers=["*"] # Allow all payload Headers
-)
+    "client": ("127.0.0.1", 54321),        - Client remote IP and port tuple
+    "server": ("10.0.0.5", 443),           - Server listening IP and port tuple
+    "app": None,                           - Starlette application instance reference
+    "router": None,                        - Starlette internal Router reference
+    "path_params": {"id": "10"}            - Path parameters injected after routing
 
-# Registers GitHub routes into application.
-app.include_router(github_router)
+
+    ===> RECEIVE PAYLOAD <===  
+
+    "type": "http.request",
+    "body": b'{"name": "John Doe"}',       - Request body segment as raw bytes
+    "more_body": False                     - True if more chunks follow, False if last
+
+    "type": "http.response.start",
+    "status": 201,                         - HTTP status code integer
+    "headers": [(b"content-type", b"application/json"),  - Response headers as raw bytes tuples
+        (b"server", b"uvicorn")]
+"""

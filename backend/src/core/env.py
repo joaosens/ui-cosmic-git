@@ -2,6 +2,7 @@ import os
 import logging
 from pathlib import Path
 from dotenv import load_dotenv
+from src.core.security import ALGORITHM
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -13,5 +14,7 @@ except Exception as e:
 
 class Settings: 
     TOKEN = os.getenv("TOKEN")
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    ALGORITHM = os.getenv("HS256")
 
 settings = Settings()
