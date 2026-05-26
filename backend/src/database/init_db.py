@@ -1,9 +1,10 @@
 from src.database.connection import engine, Base
 from src.database.models import Message
+import logging 
 
-logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
-def ini_db():
+def init_db():
     Base.metadata.create_all(bind=engine)
     logger.info("Successful! Table was created.")
 
