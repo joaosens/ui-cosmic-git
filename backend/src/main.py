@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from fastapi import FastAPI
 from src.routes.github import router as github_router
 from src.routes.messages import router as messages_router

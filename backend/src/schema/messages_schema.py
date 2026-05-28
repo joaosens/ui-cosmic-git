@@ -14,3 +14,6 @@ class MessageResponse(BaseModel): # Output message to avoid SQL-injection
     content: str
 
     created_at: datetime
+
+    class Config:
+        from_attributes = True

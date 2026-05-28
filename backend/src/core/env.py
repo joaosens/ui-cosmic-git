@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(encoding="utf-8")
 logger = logging.getLogger(__name__)
 try: 
     ENV_PATH =  Path(__file__).resolve().parents[3]/".env"
@@ -12,13 +12,16 @@ except Exception as e:
     logger.info(f"Anything was wrong: {e}")
 
 class Settings: 
-    TOKEN = os.getenv("TOKEN")
-    SECRET_KEY = os.getenv("SECRET_KEY")
-    ALGORITHM = os.getenv("ALGORITHM")
-    USER = os.getenv("USER")
-    PASSWORD = os.getenv("PASSWORD")
-    PORT = os.getenv("PORT")
-    DATABASE = os.getenv("DATABASE")
+    # Load env variables explicitly with a fallback to avoid NoneType
+    TOKEN = os.getenv("TOKEN", "")
+    SECRET_KEY = os.getenv("SECRET_KEY", "")
+    ALGORITHM = os.getenv("ALGORITHM", "")
+    USER = os.getenv("USER", "")
+    PASSWORD = os.getenv("PASSWORD", "")
+    HOST = os.getenv("HOST", "")
+    PORT = os.getenv("PORT", "")
+    DATABASE = os.getenv("DATABASE", "")
 
 
 settings = Settings()
+

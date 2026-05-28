@@ -1,6 +1,9 @@
 import asyncio
 import logging
+from fastapi.exceptions import HTTPException
 from collections import defaultdict
+from typing import Optional
+from dataclasses import dataclass
 from datetime import datetime
 
 import httpx
@@ -9,13 +12,19 @@ from src.core.env import settings
 
 logger = logging.getLogger(__name__)
 
-
+@dataclass
 class GitHubApi:
 
-    TOKEN = settings.TOKEN
+    user_token : Optional[str] = None
 
-    HEADERS = {
-        "Authorization": f"Bearer {TOKEN}"
+    @property # Uses function like a common variable
+    def token(self) -> str:
+        return self.user_token or settings.TOKEN
+
+    @property
+    def headers(self) -> dict[str, str]:
+        return {
+        "Authorization": f"Bearer {self.token}"
     }
 
     async def _get_stats(self):
@@ -24,12 +33,12 @@ class GitHubApi:
 
             repos_req = client.get(
                 "https://api.github.com/user/repos?type=public",
-                headers=self.HEADERS
+                headers=self.headers
             )
 
             followers_req = client.get(
-                "https://api.github.com/users/joaosens/followers",
-                headers=self.HEADERS
+                "https://api.github.com/user/followers",
+                headers=self.headers
             )
 
             repos, followers = await asyncio.gather(
@@ -43,9 +52,8 @@ class GitHubApi:
 
                 if response.status_code >= 400:
 
-                    raise RuntimeError(
-                        f"GitHub API Error: "
-                        f"{response.status_code} - {response.text}"
+                    raise HTTPException(
+                        status_code=502, detail=f"{response.text}"
                     )
 
             return {
@@ -67,7 +75,7 @@ class GitHubApi:
             for repo in repos
         )
 
-        languages = defaultdict(int)
+        languages = defaultdict(int) # If hasn't any value, your value's 0
 
         datetimes = []
 
@@ -221,6 +229,3 @@ class GitHubApi:
         )
 
         return final_info
-
-
-github_api = GitHubApi()
