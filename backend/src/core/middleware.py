@@ -139,3 +139,32 @@ class RateLimitMiddleware:
     "headers": [(b"content-type", b"application/json"),  - Response headers as raw bytes tuples
         (b"server", b"uvicorn")]
 """
+
+class SecurityHeadersMiddleware:
+    def __init__(self, app: ASGIApp):
+        self.app = app
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope['type'] != 'http':
+            await self.app(scope, receive, send)
+            return 
+
+        async def send_with_headers(message):
+            if message['type'] == 'http.response.start':
+                headers = dict(message.get('headers', []))
+                headers.update({
+                    b"x-content-type-options": b"nosniff",
+                    # Prevents the browser from guessing (sniffing) the file type, enforcing the declared content-type
+                    b"x-frame-options": b"DENY", 
+                    # Disables <iframe> rendering of our app on other sites, preventing Clickjacking attacks
+                    b"x-xss-protection": b"1; mode=block", 
+                    # Legacy header that blocks the page from loading if a Cross-Site Scripting (XSS) attack is detected
+                    b"strict-transport-security": b"max-age=63072000; includeSubDomains; preload",
+                    # Forces all data to travel exclusively over HTTPS (encrypted connection) for the next 2 years
+                    b"content-security-policy": b"default-src 'self'"
+                    # Only allows the browser to load resources (scripts, images, styles) originating from our own domain
+
+                })
+                message['headers'] = list(headers.items())
+            await send(message)
+
+        await self.app(scope, receive, send_with_headers)
