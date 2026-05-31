@@ -25,7 +25,7 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # 'autocommit' make transaction alone, 'autoflush' syncs in database everytime during workflow, bad for network traffic and avoid errors. 
 # In our case only me can make transaction with 'db.commit()' 
-Base = declarative_base()
+Base = declarative_base() # Here isn't need parameter 'engine', this will be connect with 'Base.metadata.create_all' later  
 # Creates an one bridge to translate code in Python to SQL
 def get_db():
     db = SessionLocal()

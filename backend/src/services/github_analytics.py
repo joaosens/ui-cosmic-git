@@ -1,10 +1,10 @@
 import asyncio
 import logging
-from fastapi.exceptions import HTTPException
 from collections import defaultdict
 from typing import Optional
 from dataclasses import dataclass
 from datetime import datetime
+from src.core.exceptions import GitHubAPIError
 
 import httpx
 
@@ -52,8 +52,8 @@ class GitHubApi:
 
                 if response.status_code >= 400:
 
-                    raise HTTPException(
-                        status_code=502, detail=f"{response.text}"
+                    raise GitHubAPIError(
+                        status_code=502, message=f"GitHub API Error: {response.text}"
                     )
 
             return {

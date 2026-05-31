@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends # 'Depends' enforce any parameter call a function before run route
 from sqlalchemy.orm import Session
-from datetime import datetime
 from src.core.security import verify_token
 from src.database.connection import get_db
 from src.database.models import Message
