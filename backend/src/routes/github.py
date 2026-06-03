@@ -31,7 +31,7 @@ async def github_stats(
     try: 
         return await api.get_github_analysis()
     except ValidationError as ve:
-        logger.exception(f"[SCHEMA ERROR] GitHub Data Invalid - {ve.errrors()}")
+        logger.exception(f"[SCHEMA ERROR] GitHub Data Invalid - {ve.errors()}")
         raise GitHubAPIError(status_code=502, message="Bad Gateway") # When server receives an invalid response from another server
     except Exception as e:
         logger.exception(f"[ERROR] {e}")

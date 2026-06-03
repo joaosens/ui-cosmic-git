@@ -4,6 +4,7 @@ import logging
 
 from fastapi.responses import JSONResponse
 from src.core.redis import redis_client
+from src.core.exceptions import DatabaseError
 
 logger = logging.getLogger(__name__)
 
@@ -54,11 +55,13 @@ class RateLimitMiddleware:
         self,
         app: ASGIApp,
         window: int,
-        max_requests: int
+        max_requests: int,
+        protected_paths: list[str] = None
     ):
         self.app = app
         self.window = window
         self.max_requests = max_requests
+        self.protected_paths = protected_paths or ["/messages/send"]
 
     async def __call__(
         self,
@@ -71,6 +74,12 @@ class RateLimitMiddleware:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
+        
+        is_protected = any(scope['path'].endswith(path) for path in self.protected_paths)
+
+        if not is_protected:
+            await self.app(scope, receive, send)
+            return
 
         # Extract client IP from ASGI scope
         client = scope.get("client")
@@ -78,30 +87,31 @@ class RateLimitMiddleware:
 
         # Unique Redis key per client
         key = f"rate_limit:{client_ip}"
+        try:
+            # Increment request counter
+            current_requests = await redis_client.incr(key)
 
-        # Increment request counter
-        current_requests = await redis_client.incr(key)
+            # Set expiration only on first request
+            if current_requests == 1:
+                await redis_client.expire(key, self.window)
 
-        # Set expiration only on first request
-        if current_requests == 1:
-            await redis_client.expire(key, self.window)
+            # Block requests above the allowed limit
+            if current_requests > self.max_requests:
 
-        # Block requests above the allowed limit
-        if current_requests > self.max_requests:
-
-            response = JSONResponse(
-                status_code=429,
-                content={
-                    "detail": (
+                response = JSONResponse(
+                    status_code=429,
+                    content={
+                        "detail": (
                         "Too many requests"
+                        )
+                        }
                     )
-                }
-            )
-
-            # Send ASGI response manually
-            await response(scope, receive, send)
-            return
-
+                logger.warning(f"[RATE LIMIT] Client {client_ip} exceeded the limit of {self.max_requests} requests in {self.window} seconds")
+                # Send ASGI response manually
+                await send(response)
+                return
+        except Exception as e:
+            logger.exception(f"[ERROR] Redis Rate Limit Error: {e}")
         # Continue normal request flow
         await self.app(scope, receive, send)
 
@@ -162,7 +172,8 @@ class SecurityHeadersMiddleware:
                     # Forces all data to travel exclusively over HTTPS (encrypted connection) for the next 2 years
                     b"content-security-policy": b"default-src 'self'"
                     # Only allows the browser to load resources (scripts, images, styles) originating from our own domain
-
+                    # If you want to allow other domains, you can add them here
+                    # b"content-security-policy": b"default-src 'self' https://example.com"
                 })
                 message['headers'] = list(headers.items())
             await send(message)
