@@ -5,6 +5,7 @@ from src.core.env import settings
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from passlib.context import CryptContext # That's package has an interesting features with mathematic logic for handling passwords 
+import hashlib
 
 class Token:
     security = HTTPBearer() #Implements "Authorization: Bearer {TOKEN}" in header
@@ -26,12 +27,14 @@ class Token:
         return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM) # Returns a string in base64 format among 'header(base64) + payload(base64) + signature(hashed via algorithm)'
 
 class Password:
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")  
+    pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")  
     # The 'bcrypt' scheme is a slow algorithm with a slight delay on purpose to prevent brute-force attacks
     # 'deprecated="auto"' allows switching hashing schemes in the future without breaking compatibility for existing users.
-    def get_password_hash(self, password: str) -> str:
-        return self.pwd_context.hash(password)
-    def verify_password(self, plain_password: str, # What the user send for can sign in
+    @staticmethod  # To avoid needing 'self'
+    def get_password_hash(password: str) -> str:
+        return Password.pwd_context.hash(password)
+    @staticmethod
+    def verify_password(plain_password: str, # What the user send for can sign in
      hashed_password: str # What is saved in database 
      ) -> bool:
-        return self.pwd_context.verify(plain_password, hashed_password)
+        return Password.pwd_context.verify(plain_password, hashed_password)

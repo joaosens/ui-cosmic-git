@@ -7,7 +7,7 @@ from src.schema.messages_schema import MessageCreate, MessageResponse
 
 router = APIRouter()
 
-@router.post("/messages/send", response_model=MessageResponse)
+@router.post("/send", response_model=MessageResponse)
 async def send_message(
     data: MessageCreate, 
     payload: dict = Depends(Token.verify_token)):

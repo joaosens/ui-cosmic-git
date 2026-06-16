@@ -32,3 +32,5 @@ class UserConfig(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(String, ForeignKey("users.id"), unique=True, nullable=False, index=True)
     git_token = Column(String, nullable=False)
+
+    user = relationship("User", back_populates="config", uselist=False)

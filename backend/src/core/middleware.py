@@ -170,7 +170,7 @@ class SecurityHeadersMiddleware:
                     # Legacy header that blocks the page from loading if a Cross-Site Scripting (XSS) attack is detected
                     b"strict-transport-security": b"max-age=63072000; includeSubDomains; preload",
                     # Forces all data to travel exclusively over HTTPS (encrypted connection) for the next 2 years
-                    b"content-security-policy": b"default-src 'self'"
+                    b"content-security-policy": b"default-src 'self' https://cdn.jsdelivr.net https://fastapi.tiangolo.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net"
                     # Only allows the browser to load resources (scripts, images, styles) originating from our own domain
                     # If you want to allow other domains, you can add them here
                     # b"content-security-policy": b"default-src 'self' https://example.com"
