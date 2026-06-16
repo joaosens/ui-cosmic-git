@@ -1,11 +1,11 @@
 from mailbox import Message
-from fastapi import APIRouter, Depends, JSONResponse
+from fastapi import APIRouter, Depends
 from pydantic import ValidationError # ValidationError helps with a traceback better
 from sqlalchemy.orm import Session
 import logging
 from src.schema.github_schema import ApiSchema
 from src.services.github_analytics import GitHubApi
-from src.core.security import verify_token
+from src.core.security import Token
 from src.core.exceptions import GitHubAPIError
 from src.database.models import UserConfig 
 from src.database.connection import get_db
@@ -17,7 +17,7 @@ router = APIRouter() # APIRouter modularizes HTTP domains and separates route re
 @router.get("/github", response_model=ApiSchema) # response_model integrates Pydantic validation into the request lifecycle, 
 # enforcing a typed API contract, automatic serialization, response filtering, and OpenAPI documentation generation.
 async def github_stats(
-    payload: dict[str, str] = Depends(verify_token),
+    payload: dict[str, str] = Depends(Token.verify_token),
     db : Session = Depends(get_db)
 ):
     user_id = payload.get("sub")
