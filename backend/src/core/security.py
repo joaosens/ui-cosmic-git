@@ -5,11 +5,11 @@ from src.core.env import settings
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from passlib.context import CryptContext # That's package has an interesting features with mathematic logic for handling passwords 
-import hashlib
 
-class Token:
+class AuthHandler:
     security = HTTPBearer() #Implements "Authorization: Bearer {TOKEN}" in header
 
+    @staticmethod
     def verify_token(credentials: HTTPAuthorizationCredentials = Security(security)) -> Optional[Dict[str, Any]]:
         token = credentials.credentials #It's token, and 'credentials.scheme' is format that's 'Bearer'. 
         try:

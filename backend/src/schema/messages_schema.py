@@ -1,4 +1,4 @@
-from pydantic import BaseModel 
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime 
 
 class MessageCreate(BaseModel):
@@ -15,5 +15,4 @@ class MessageResponse(BaseModel): # Output message to avoid SQL-injection
 
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True) # It's a configuration for Pydantic to get translated data straight from the database

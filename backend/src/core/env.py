@@ -21,6 +21,7 @@ class Settings:
     HOST = os.getenv("HOST", "")
     PORT = os.getenv("PORT", "")
     DATABASE = os.getenv("DATABASE", "")
+    ACCESS_TOKEN_EXPIRE_HOURS = int(os.getenv("ACCESS_TOKEN_EXPIRE_HOURS", ""))
 
 
 settings = Settings()
