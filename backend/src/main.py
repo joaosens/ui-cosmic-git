@@ -5,9 +5,11 @@ from src.core.exceptions import global_exception_handler
 from src.routes.github import router as github_router
 from src.routes.messages import router as messages_router
 from src.routes.auth import router as auth_router 
+from src.routes.settings import router as settings_router 
+from src.routes.donate import router as donate_router
 from src.database.init_db import init_db
 from src.database.connection import engine, Base
-from src.core.exceptions import GitHubAPIError, github_exception_handler, DatabaseError, database_exception_handler, global_exception_handler
+from src.core.exceptions import GitHubAPIError, github_exception_handler, DatabaseError, database_exception_handler, MercadoPagoError, mercadopago_exception_handler, global_exception_handler
 from src.core.middleware import SecurityHeadersMiddleware, RateLimitMiddleware, LogRequestsMiddleware
 
 import logging
@@ -31,11 +33,14 @@ async def health_check():
 app.include_router(github_router)
 app.include_router(messages_router, prefix="/messages")
 app.include_router(auth_router, prefix="/auth")
+app.include_router(settings_router, prefix="/settings")
+app.include_router(donate_router)
 
 # Exception Handlers
 app.add_exception_handler(GitHubAPIError, github_exception_handler)
 app.add_exception_handler(Exception, global_exception_handler)
 app.add_exception_handler(DatabaseError, database_exception_handler)
+app.add_exception_handler(MercadoPagoError, mercadopago_exception_handler)
 
 # Middleware
 app.add_middleware(LogRequestsMiddleware)

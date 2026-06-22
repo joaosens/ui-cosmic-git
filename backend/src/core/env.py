@@ -22,6 +22,7 @@ class Settings:
     PORT = os.getenv("PORT", "")
     DATABASE = os.getenv("DATABASE", "")
     ACCESS_TOKEN_EXPIRE_HOURS = int(os.getenv("ACCESS_TOKEN_EXPIRE_HOURS", ""))
+    ACCESS_TOKEN_MERCADOPAGO = os.getenv("ACCESS_TOKEN_MERCADOPAGO", "")
 
 
 settings = Settings()

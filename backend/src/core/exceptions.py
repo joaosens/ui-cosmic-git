@@ -35,3 +35,14 @@ async def database_exception_handler(request: Request, exc=DatabaseError):
         }
     )
 
+@dataclass 
+class MercadoPagoError(Exception):
+    message:str
+    status_code: int = 500
+async def mercadopago_exception_handler(request: Request, exc=MercadoPagoError):
+    return JSONResponse(
+        status_code= exc.status_code,
+        content={"detail": exc.message
+        }
+    )
+
