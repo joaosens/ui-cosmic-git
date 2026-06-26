@@ -18,7 +18,7 @@ async def save_token(
     # Querying with Python objects (ORM) prevents SQL injection and catches errors during development.
     if user_config: 
         user_config.git_token = data.git_token
-        message = "Token updated successfully."
+        message = "Token updated successfully." 
     else: 
         new_config = UserConfig(user_id=user_id, git_token=data.git_token)
         db.add(new_config)

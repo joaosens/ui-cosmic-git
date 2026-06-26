@@ -8,7 +8,6 @@ from src.routes.auth import router as auth_router
 from src.routes.settings import router as settings_router 
 from src.routes.donate import router as donate_router
 from src.database.init_db import init_db
-from src.database.connection import engine, Base
 from src.core.exceptions import GitHubAPIError, github_exception_handler, DatabaseError, database_exception_handler, MercadoPagoError, mercadopago_exception_handler, global_exception_handler
 from src.core.middleware import SecurityHeadersMiddleware, RateLimitMiddleware, LogRequestsMiddleware
 
